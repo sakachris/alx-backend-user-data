@@ -5,6 +5,8 @@ import re
 import logging
 from typing import List
 
+PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
+
 
 def extract_pattern(fields: List[str], separator: str) -> str:
     ''' Generate the regular expression pattern for extracting fields '''
@@ -40,5 +42,18 @@ class RedactingFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         ''' formatting log record '''
         msg = super(RedactingFormatter, self).format(record)
-        txt = filter_datum(self.fields, self.REDACTION, msg, self.SEPARATOR)
-        return txt
+        return filter_datum(self.fields, self.REDACTION, msg, self.SEPARATOR)
+
+
+def get_logger() -> logging.Logger:
+    ''' Setup logger named user_data '''
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    stream_handler = logging.StreamHandler()
+    formatter = RedactingFormatter(PII_FIELDS)
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    return logger
