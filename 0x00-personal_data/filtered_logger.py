@@ -2,6 +2,7 @@
 ''' filtered_logger.py '''
 
 import re
+import logging
 from typing import List
 
 
