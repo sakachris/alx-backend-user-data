@@ -76,3 +76,24 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
         database=dbname
     )
     return db
+
+
+def main() -> None:
+    ''' retrieves data from the users table and log it '''
+    logger = get_logger()
+    db = get_db()
+
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users;")
+    for row in cursor:
+        filtered_row = filter_datum(
+                PII_FIELDS, RedactingFormatter.REDACTION, str(row), ';'
+        )
+        logger.info(filtered_row)
+
+    cursor.close()
+    db.close()
+
+
+if __name__ == "__main__":
+    main()
