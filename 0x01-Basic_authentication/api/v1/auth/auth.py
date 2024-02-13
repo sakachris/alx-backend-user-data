@@ -24,10 +24,8 @@ class Auth:
 
         for excluded_path in excluded_paths:
             if excluded_path.endswith('/'):
-                # Remove trailing slash for comparison
                 excluded_path = excluded_path[:-1]
             if path.endswith('/'):
-                # Remove trailing slash for comparison
                 path = path[:-1]
             if fnmatch.fnmatch(path, excluded_path):
                 return False
