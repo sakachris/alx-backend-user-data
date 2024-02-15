@@ -2,6 +2,7 @@
 ''' api/v1/auth/session_auth.py '''
 
 from .auth import Auth
+from models.user import User
 import uuid
 
 
@@ -24,3 +25,12 @@ class SessionAuth(Auth):
             return None
 
         return self.user_id_by_session_id.get(session_id)
+
+    def current_user(self, request=None) -> User:
+        ''' returns current user '''
+        if request is None:
+            return None
+        user_id = self.user_id_for_session_id(self.session_cookie(request))
+        if user_id:
+            return User.get(user_id)
+        return None
