@@ -15,7 +15,7 @@ def welcome() -> str:
     return jsonify({"message": "Bienvenue"})
 
 
-@app.route('/users', methods=['POST'])
+@app.route('/users', methods=['POST'], strict_slashes=False)
 def users() -> Dict[str, Any]:
     ''' endpoint to register user '''
     try:
@@ -28,7 +28,7 @@ def users() -> Dict[str, Any]:
         return jsonify({"message": "email already registered"}), 400
 
 
-@app.route('/sessions', methods=['POST'])
+@app.route('/sessions', methods=['POST'], strict_slashes=False)
 def login() -> Dict[str, Any]:
     ''' endpoint to log in user '''
     email: str = request.form.get('email')
@@ -43,7 +43,7 @@ def login() -> Dict[str, Any]:
         abort(401)
 
 
-@app.route("/sessions", methods=["DELETE"])
+@app.route("/sessions", methods=["DELETE"], strict_slashes=False)
 def logout() -> str:
     """Logout the user by destroying the session."""
     session_id = request.cookies.get("session_id")
@@ -52,6 +52,16 @@ def logout() -> str:
         abort(403)
     AUTH.destroy_session(user.id)
     return redirect("/")
+
+
+@app.route("/profile", methods=["GET"], strict_slashes=False)
+def profile() -> str:
+    """Retrieve user profile."""
+    session_id = request.cookies.get("session_id")
+    user = AUTH.get_user_from_session_id(session_id)
+    if user is None:
+        abort(403)
+    return jsonify({"email": user.email}), 200
 
 
 if __name__ == "__main__":
