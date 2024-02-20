@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 ''' app.py '''
 
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort, redirect
 from auth import Auth
-from typing import Dict, Any
+from typing import Dict, Any, Union
 
 app = Flask(__name__)
 AUTH = Auth()
@@ -41,6 +41,18 @@ def login() -> Dict[str, Any]:
         return response, 200
     else:
         abort(401)
+
+
+@app.route("/sessions", methods=["DELETE"])
+def logout() -> Union[Response, Tuple[str, int]]:
+    """Logout the user by destroying the session."""
+    session_id = request.cookies.get("session_id")
+    if session_id:
+        user = AUTH.get_user_from_session_id(session_id)
+        if user:
+            AUTH.destroy_session(user.id)
+            return redirect("/")
+    return jsonify({"message": "Forbidden"}), 403
 
 
 if __name__ == "__main__":
